@@ -59,7 +59,7 @@ volatile boolean QS2 = false;        // becomes true when Arduoino finds a beat.
 
 
 // Set up use of NeoPixels
-const int NUMPIXELS = 300;           // Put the number of NeoPixels you are using here
+const int NUMPIXELS = 160;           // Put the number of NeoPixels you are using here
 const int BRIGHTNESS = 20;          // Set brightness of NeoPixels here
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUMPIXELS, fadePin, NEO_GRB + NEO_KHZ800);
 
@@ -105,13 +105,13 @@ if (N > 250){                                   // avoid high frequency noise
          if(firstBeat){                         // if it's the first time we found a beat, if firstBeat == TRUE
              firstBeat = false;                 // clear firstBeat flag
              return;                            // IBI value is unreliable so discard it
-          }   
+            }   
          if(secondBeat){                        // if this is the second beat, if secondBeat == TRUE
             secondBeat = false;                 // clear secondBeat flag
                for(int i=0; i<=9; i++){         // seed the running total to get a realisitic BPM at startup
                     rate[i] = IBI;                      
-                }
-          }
+                    }
+            }
           
     // keep a running total of the last 10 IBI values
     word runningTotal = 0;                   // clear the runningTotal variable    
@@ -119,7 +119,7 @@ if (N > 250){                                   // avoid high frequency noise
     for(int i=0; i<=8; i++){                // shift data in the rate array
           rate[i] = rate[i+1];              // and drop the oldest IBI value 
           runningTotal += rate[i];          // add up the 9 oldest IBI values
-    }
+        }
         
     rate[9] = IBI;                          // add the latest IBI to the rate array
     runningTotal += rate[9];                // add the latest IBI to runningTotal
@@ -127,6 +127,7 @@ if (N > 250){                                   // avoid high frequency noise
     BPM = 60000/runningTotal;               // how many beats can fit into a minute? that's BPM!
     QS = true;                              // set Quantified Self flag 
     // QS FLAG IS NOT CLEARED INSIDE THIS ISR
+    }
   }
 
     if (Signal < thresh && Pulse == true){     // when the values are going down, the beat is over
@@ -168,41 +169,40 @@ if (N > 250){                                   // avoid high frequency noise
     
   //  NOW IT'S TIME TO LOOK FOR THE HEART BEAT
   // signal surges up in value every time there is a pulse
-if (N > 250){                                   // avoid high frequency noise
-  if ( (Signal2 > thresh2) && (Pulse2 == false) && (N > (IBI2/5)*3) ){        
-    Pulse2 = true;                               // set the Pulse flag when we think there is a pulse
-    digitalWrite(blinkPin,HIGH);                // turn on pin 13 LED
-    IBI2 = sampleCounter2 - lastBeatTime2;         // measure time between beats in mS
-    lastBeatTime2 = sampleCounter2;               // keep track of time for next pulse
-         
-         if(firstBeat2){                         // if it's the first time we found a beat, if firstBeat == TRUE
-             firstBeat2 = false;                 // clear firstBeat flag
-             return;                            // IBI value is unreliable so discard it
-            }   
-         if(secondBeat2){                        // if this is the second beat, if secondBeat == TRUE
-            secondBeat2 = false;                 // clear secondBeat flag
-               for(int i=0; i<=9; i++){         // seed the running total to get a realisitic BPM at startup
-                    rate2[i] = IBI2;                      
-                    }
-            }
+  if (N2 > 250){                                   // avoid high frequency noise
+    if ( (Signal2 > thresh2) && (Pulse2 == false) && (N > (IBI2/5)*3) ){        
+      Pulse2 = true;                               // set the Pulse flag when we think there is a pulse
+      digitalWrite(blinkPin,HIGH);                // turn on pin 13 LED
+      IBI2 = sampleCounter2 - lastBeatTime2;         // measure time between beats in mS
+      lastBeatTime2 = sampleCounter2;               // keep track of time for next pulse
           
-    // keep a running total of the last 10 IBI values
-    word runningTotal2 = 0;                   // clear the runningTotal variable    
+          if(firstBeat2){                         // if it's the first time we found a beat, if firstBeat == TRUE
+              firstBeat2 = false;                 // clear firstBeat flag
+              return;                            // IBI value is unreliable so discard it
+              }   
+          if(secondBeat2){                        // if this is the second beat, if secondBeat == TRUE
+              secondBeat2 = false;                 // clear secondBeat flag
+                for(int i=0; i<=9; i++){         // seed the running total to get a realisitic BPM at startup
+                      rate2[i] = IBI2;                      
+                      }
+              }
+            
+      // keep a running total of the last 10 IBI values
+      word runningTotal2 = 0;                   // clear the runningTotal variable    
 
-    for(int i=0; i<=8; i++){                // shift data in the rate array
-          rate2[i] = rate2[i+1];              // and drop the oldest IBI value 
-          runningTotal2 += rate2[i];          // add up the 9 oldest IBI values
-        }
-        
-    rate2[9] = IBI2;                          // add the latest IBI to the rate array
-    runningTotal2 += rate2[9];                // add the latest IBI to runningTotal
-    runningTotal2 /= 10;                     // average the last 10 IBI values 
-    BPM2 = 60000/runningTotal2;               // how many beats can fit into a minute? that's BPM!
-    QS2 = true;                              // set Quantified Self flag 
-    // QS FLAG IS NOT CLEARED INSIDE THIS ISR
-    }                       
-
-}
+      for(int i=0; i<=8; i++){                // shift data in the rate array
+            rate2[i] = rate2[i+1];              // and drop the oldest IBI value 
+            runningTotal2 += rate2[i];          // add up the 9 oldest IBI values
+          }
+          
+      rate2[9] = IBI2;                          // add the latest IBI to the rate array
+      runningTotal2 += rate2[9];                // add the latest IBI to runningTotal
+      runningTotal2 /= 10;                     // average the last 10 IBI values 
+      BPM2 = 60000/runningTotal2;               // how many beats can fit into a minute? that's BPM!
+      QS2 = true;                              // set Quantified Self flag 
+      // QS FLAG IS NOT CLEARED INSIDE THIS ISR
+      }                       
+  }
 
   if (Signal2 < thresh2 && Pulse2 == true){     // when the values are going down, the beat is over
       digitalWrite(blinkPin,LOW);            // turn off pin 13 LED
@@ -213,7 +213,7 @@ if (N > 250){                                   // avoid high frequency noise
       T2 = thresh2;
      }
   
-  if (N > 2500){                             // if 2.5 seconds go by without a beat
+  if (N2 > 2500){                             // if 2.5 seconds go by without a beat
       thresh2 = 512;                          // set thresh default
       P2 = 512;                               // set P default
       T2 = 512;                               // set T default
@@ -274,7 +274,7 @@ void ledFadeToBeat() {
     }
     intensity2 = constrain(intensity2,0,255);   // Keep LED fade value from going into negative numbers
 
-    setStrip(intensity1, intensity2);                     // Write the value to the NeoPixels 
+    setStrip(intensity, intensity2);                     // Write the value to the NeoPixels 
 
 //    sendDataSerial('R',intensity);
 }
@@ -291,7 +291,7 @@ void setStrip(int r, int r2) {     // Set the strip to one color intensity (red)
       strip.setPixelColor(x, strip.Color(r, g, r));
    }
    for (int x=NUMPIXELS/2 + 1; x < NUMPIXELS; x++) {
-    strip.setPixelColor(x, strip.Color(r2, g, r2));
+    strip.setPixelColor(x, strip.Color(r2/2, g, r2));
    }
 
    strip.show();
