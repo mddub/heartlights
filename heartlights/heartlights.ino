@@ -173,7 +173,7 @@ if (N > 250){                                   // avoid high frequency noise
   //  NOW IT'S TIME TO LOOK FOR THE HEART BEAT
   // signal surges up in value every time there is a pulse
   if (N2 > 250){                                   // avoid high frequency noise
-    if ( (Signal2 > thresh2) && (Pulse2 == false) && (N > (IBI2/5)*3) ){        
+    if ( (Signal2 > thresh2) && (Pulse2 == false) && (N2 > (IBI2/5)*3) ){        
       Pulse2 = true;                               // set the Pulse flag when we think there is a pulse
       digitalWrite(blinkPin,HIGH);                // turn on pin 13 LED
       IBI2 = sampleCounter2 - lastBeatTime2;         // measure time between beats in mS
@@ -220,7 +220,7 @@ if (N > 250){                                   // avoid high frequency noise
       thresh2 = 512;                          // set thresh default
       P2 = 512;                               // set P default
       T2 = 512;                               // set T default
-      lastBeatTime2 = sampleCounter;          // bring the lastBeatTime up to date        
+      lastBeatTime2 = sampleCounter2;          // bring the lastBeatTime up to date        
       firstBeat2 = true;                      // set these to avoid noise
       secondBeat2 = true;                     // when we get the heartbeat back
      }
