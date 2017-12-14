@@ -45,7 +45,7 @@ int intensity = 0;                // used to fade LED on with PWM on fadePin
 int delta= 0;                     // used to fade LED on with PWM on fadePin
 int intensity2 = 0;                // used to fade LED on with PWM on fadePin
 int delta2= 0;                     // used to fade LED on with PWM on fadePin
-int xOffset = 0;
+int xOffsetTimesTen = 0;
 
 
 // these variables are volatile because they are used during the interrupt service routine
@@ -70,6 +70,8 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUMPIXELS, fadePin, NEO_GRB + NEO_KH
 // Custom Smooth BPM
 volatile unsigned long bpm_timer = 0;
 volatile unsigned long bpm_timer2 = 0;
+
+volatile unsigned long timeOfLastMatch = 0;
 
 
 
@@ -278,6 +280,12 @@ void loop(){
 //    delta2 = 255 / (IBI / (DELAY_MS * 2));
 //    bpm_timer2 = 0;
 //  }
+
+  int bpmDelta = abs(BPM - BPM2);
+  if (bpmDelta <= 10) {
+    timeOfLastMatch = millis();
+  }
+
   ledFadeToBeat();                    // Routine that fades color intensity to the beat
   delay(DELAY_MS);                          //  take a break
 }
@@ -306,11 +314,15 @@ void sendDataSerial(char symbol, int data ) {
 }
 
 void setStrip(int r, int r2) {     // Set the strip to one color intensity (red)
-   int bpmDelta = abs(BPM - BPM2);
-   if (bpmDelta <= 10) {
-      xOffset += 1;
+   if (millis() - timeOfLastMatch < 4000) {
+     xOffsetTimesTen += 10;
+   } else if (millis() - timeOfLastMatch < 6000) {
+     xOffsetTimesTen += 5;
+   } else if (millis() - timeOfLastMatch < 8000) {
+     xOffsetTimesTen += 2;
    }
 
+   int xOffset = xOffsetTimesTen / 10;
    for (int x=xOffset; x < NUMPIXELS/2 + xOffset; x++) {
       strip.setPixelColor(x % NUMPIXELS, strip.Color(r, 0, (float)r * 0.8));
    }
