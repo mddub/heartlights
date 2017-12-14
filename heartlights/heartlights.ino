@@ -43,6 +43,9 @@ int blinkPin = 13;                // Digital pin to blink led at each beat
 int fadePin  = 5;                 // pin to do fancy neopixel effects at each beat
 int intensity = 0;                // used to fade LED on with PWM on fadePin
 int delta= 0;                     // used to fade LED on with PWM on fadePin
+int intensity2 = 0;                // used to fade LED on with PWM on fadePin
+int delta2= 0;                     // used to fade LED on with PWM on fadePin
+
 
 // these variables are volatile because they are used during the interrupt service routine
 volatile int BPM;                   // used to hold the pulse rate
@@ -59,7 +62,7 @@ volatile boolean QS2 = false;        // becomes true when Arduoino finds a beat.
 
 
 // Set up use of NeoPixels
-const int NUMPIXELS = 160;           // Put the number of NeoPixels you are using here
+const int NUMPIXELS = 200;           // Put the number of NeoPixels you are using here
 const int BRIGHTNESS = 20;          // Set brightness of NeoPixels here
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUMPIXELS, fadePin, NEO_GRB + NEO_KHZ800);
 
@@ -288,10 +291,10 @@ void setStrip(int r, int r2) {     // Set the strip to one color intensity (red)
    int g = 0;              // Green is set to zero (for non-red colors, change this)
    int b = 0;              // Blue is set to zero (for non-red colors, change this)
    for (int x=0; x < NUMPIXELS/2; x++) {
-      strip.setPixelColor(x, strip.Color(r, g, r));
+      strip.setPixelColor(x, strip.Color(r, 0, r));
    }
    for (int x=NUMPIXELS/2 + 1; x < NUMPIXELS; x++) {
-    strip.setPixelColor(x, strip.Color(r2/2, g, r2));
+    strip.setPixelColor(x, strip.Color(r2, r2, 0));
    }
 
    strip.show();
