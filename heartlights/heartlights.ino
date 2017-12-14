@@ -293,8 +293,8 @@ void setStrip(int r, int r2) {     // Set the strip to one color intensity (red)
    for (int x=0; x < NUMPIXELS/2; x++) {
       strip.setPixelColor(x, strip.Color(r, 0, r));
    }
-   for (int x=NUMPIXELS/2 + 1; x < NUMPIXELS; x++) {
-    strip.setPixelColor(x, strip.Color(r2, r2, 0));
+   for (int x=NUMPIXELS/2; x < NUMPIXELS; x++) {
+    strip.setPixelColor(x, strip.Color(r2/3, r2/3, r2/4));
    }
 
    strip.show();
