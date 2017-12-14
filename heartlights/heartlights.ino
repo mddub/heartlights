@@ -66,6 +66,10 @@ const int NUMPIXELS = 200;           // Put the number of NeoPixels you are usin
 const int BRIGHTNESS = 20;          // Set brightness of NeoPixels here
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUMPIXELS, fadePin, NEO_GRB + NEO_KHZ800);
 
+// Custom Smooth BPM
+volatile unsigned long bpm_timer = 0;
+volatile unsigned long bpm_timer2 = 0;
+
 
 
 void interruptSetup(){     
@@ -83,6 +87,8 @@ ISR(TIMER2_COMPA_vect){                         // triggered when Timer2 counts 
     cli();                                      // disable interrupts while we do this
     int Signal = analogRead(pulsePin);              // read the Pulse Sensor 
     sampleCounter += 2;                         // keep track of the time in mS with this variable
+    bpm_timer += 2;
+    bpm_timer2 += 2;
     int N = sampleCounter - lastBeatTime;       // monitor the time since the last beat to avoid noise
 
 //  find the peak and trough of the pulse wave
@@ -247,7 +253,7 @@ void setup(){
 const int DELAY_MS = 20;
 
 void loop(){
-//  sendDataSerial('S', Signal);      // send Processing the raw Pulse Sensor data
+  sendDataSerial('S', Signal);      // send Processing the raw Pulse Sensor data
   if (QS == true && BPM < 120){                    // Quantified Self flag is true when arduino finds a heartbeat
      delta = 255 / (IBI / (DELAY_MS * 2));  // Set 'intensity' Variable to 255 to fade LED with pulse
      sendDataSerial('B',BPM);       // send heart rate with a 'B' prefix
@@ -260,6 +266,17 @@ void loop(){
     sendDataSerial('q',IBI2);       // send time between beats with a 'Q' prefix
     QS2 = false;                      // reset the Quantified Self flag for next time    
  }
+//  sendDataSerial('b',BPM);       // send heart rate with a 'B' prefix
+//  sendDataSerial('c',BPM2);
+  
+//  if(bpm_timer >= (60000/BPM)){
+//    delta = 255 / (IBI / (DELAY_MS * 2));
+//    bpm_timer = 0;
+//  }
+//  if(bpm_timer2 >= (60000/BPM2)){
+//    delta2 = 255 / (IBI / (DELAY_MS * 2));
+//    bpm_timer2 = 0;
+//  }
   ledFadeToBeat();                    // Routine that fades color intensity to the beat
   delay(DELAY_MS);                          //  take a break
 }
@@ -291,10 +308,13 @@ void setStrip(int r, int r2) {     // Set the strip to one color intensity (red)
    int g = 0;              // Green is set to zero (for non-red colors, change this)
    int b = 0;              // Blue is set to zero (for non-red colors, change this)
    for (int x=0; x < NUMPIXELS/2; x++) {
-      strip.setPixelColor(x, strip.Color(r, 0, r));
+    strip.setPixelColor(x, strip.Color(r, 0, (float)r * 0.8));
    }
    for (int x=NUMPIXELS/2; x < NUMPIXELS; x++) {
-    strip.setPixelColor(x, strip.Color(r2/3, r2/3, r2/4));
+    //int blue = (float)r2/1.5;
+    strip.setPixelColor(x, strip.Color(r2/3, r2/4, r2));
+    //int red = (float)r2 * 0.25;
+    //strip.setPixelColor(x, strip.Color(red, 0, r2/4));
    }
 
    strip.show();
